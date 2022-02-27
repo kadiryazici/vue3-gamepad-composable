@@ -1,4 +1,4 @@
-import { ref } from 'vue';
+import { computed, ref } from 'vue';
 
 export const enum XboxButtons {
    A,
@@ -30,18 +30,14 @@ export enum XboxAxes {
 const isBrowser = () => typeof window !== 'undefined' && typeof document !== 'undefined';
 
 interface IGamepadOptions {
-   gamepadIndex?: number;
-   autostart?: boolean;
+   index?: number;
 }
 
 const isTriggerButton = (index: number) => index === 6 || index === 7;
 
 export function useGamepad({
-   gamepadIndex = 0, //
-   autostart = true,
+   index: gamepadIndex = 0, //
 }: IGamepadOptions = {}) {
-   let activeAnimationFrame = -1;
-
    const A = ref(false);
    const B = ref(false);
    const X = ref(false);
@@ -59,20 +55,22 @@ export function useGamepad({
    const Left = ref(false);
    const Right = ref(false);
    const XboxKey = ref(false);
-   const isGamepadConnected = ref(false);
 
    const LeftX = ref(0);
    const LeftY = ref(0);
    const RightX = ref(0);
    const RightY = ref(0);
 
-   const stopLoop = () => {
-      cancelAnimationFrame(activeAnimationFrame);
-      activeAnimationFrame = -1;
-   };
-   const startLoop = () => {
-      activeAnimationFrame = requestAnimationFrame(gameLoop);
-   };
+   const isConnected = ref(false);
+   if (isBrowser()) {
+      window.addEventListener('gamepadconnected', (e) => {
+         if (e.gamepad.index === gamepadIndex) isConnected.value = true;
+      });
+
+      window.addEventListener('gamepaddisconnected', (e) => {
+         if (e.gamepad.index === gamepadIndex) isConnected.value = false;
+      });
+   }
 
    const buttons = [A, B, X, Y, LB, RB, LR, LT, Back, Start, LSB, RSB, Up, Down, Left, Right, XboxKey];
    const axes = [LeftX, LeftY, RightX, RightY];
@@ -88,20 +86,12 @@ export function useGamepad({
       }
    }
 
-   function loopRestartOnFailure() {
-      activeAnimationFrame = requestAnimationFrame(gameLoop);
-      isGamepadConnected.value = false;
-      resetState();
-   }
-
-   function gameLoop() {
-      if (!isBrowser()) return;
-
+   function tick() {
       const gamepads = navigator.getGamepads();
-      if (gamepads.length === 0) return loopRestartOnFailure();
+      if (gamepads.length === 0) return resetState();
 
       const gamepad = gamepads[gamepadIndex]!;
-      if (!gamepad) return loopRestartOnFailure();
+      if (!gamepad) return resetState();
 
       gamepad.buttons.forEach(({ pressed, value }, index) => {
          buttons[index].value = isTriggerButton(index) ? value : pressed;
@@ -110,38 +100,31 @@ export function useGamepad({
       gamepad.axes.forEach((axis, index) => {
          axes[index].value = axis;
       });
-
-      activeAnimationFrame = requestAnimationFrame(gameLoop);
-   }
-
-   if (autostart) {
-      activeAnimationFrame = requestAnimationFrame(gameLoop);
    }
 
    return {
-      A,
-      B,
-      X,
-      Y,
-      LB,
-      RB,
-      LR,
-      LT,
-      Back,
-      Start,
-      LSB,
-      RSB,
-      Up,
-      Down,
-      Left,
-      Right,
-      XboxKey,
-      isGamepadConnected,
-      LeftX,
-      LeftY,
-      RightX,
-      RightY,
-      stopLoop,
-      startLoop,
+      A: computed(() => A.value),
+      B: computed(() => B.value),
+      X: computed(() => X.value),
+      Y: computed(() => Y.value),
+      LB: computed(() => LB.value),
+      RB: computed(() => RB.value),
+      LR: computed(() => LR.value),
+      LT: computed(() => LT.value),
+      Back: computed(() => Back.value),
+      Start: computed(() => Start.value),
+      LSB: computed(() => LSB.value),
+      RSB: computed(() => RSB.value),
+      Up: computed(() => Up.value),
+      Down: computed(() => Down.value),
+      Left: computed(() => Left.value),
+      Right: computed(() => Right.value),
+      XboxKey: computed(() => XboxKey.value),
+      LeftX: computed(() => LeftX.value),
+      LeftY: computed(() => LeftY.value),
+      RightX: computed(() => RightX.value),
+      RightY: computed(() => RightY.value),
+      isConnected: computed(() => isConnected.value),
+      tick,
    };
 }

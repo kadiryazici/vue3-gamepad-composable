@@ -1,16 +1,20 @@
 <script setup lang="ts">
-import { computed, onMounted, ref, watchEffect } from 'vue';
-import { WindowEvents } from 'vue3-window-events';
+import { onMounted, ref, watchEffect } from 'vue';
 import { useGamepad } from './composables/useGamepad';
 
-const { LeftX, LeftY, RightX, RightY } = useGamepad();
+const { LeftX, LeftY, isConnected, tick } = useGamepad();
+const { isConnected: isConnected2, LeftX: LeftX2, LeftY: LeftY2, tick: tick2 } = useGamepad({ index: 1 });
+
 const canvas = ref<HTMLCanvasElement>();
 
 let context: CanvasRenderingContext2D | null | undefined = null;
 let delta = 0;
 let oldTime = performance.now();
+
 const boxPositions = [10, 10] as [number, number];
-const boxDimesions = [10, 10] as [number, number];
+const boxPositions2 = [50, 50] as [number, number];
+const boxDimesions = [50, 50] as [number, number];
+const boxSpeed = 200;
 
 watchEffect(
    () => {
@@ -31,11 +35,23 @@ function startGame() {
    oldTime = newTime;
 
    context.clearRect(0, 0, canvas.value.width, canvas.value.height);
-   context.fillStyle = 'red';
-   context.fillRect(...boxPositions, ...boxDimesions);
 
-   boxPositions[0] += 100 * clampAxis(LeftX.value) * delta;
-   boxPositions[1] += 100 * clampAxis(LeftY.value) * delta;
+   if (isConnected.value) {
+      tick();
+      context.fillStyle = 'red';
+      context.fillRect(...boxPositions, ...boxDimesions);
+
+      boxPositions[0] += boxSpeed * clampAxis(LeftX.value) * delta;
+      boxPositions[1] += boxSpeed * clampAxis(LeftY.value) * delta;
+   }
+
+   if (isConnected2.value) {
+      tick2();
+      context.fillStyle = 'blue';
+      context.fillRect(...boxPositions2, ...boxDimesions);
+      boxPositions2[0] += boxSpeed * clampAxis(LeftX2.value) * delta;
+      boxPositions2[1] += boxSpeed * clampAxis(LeftY2.value) * delta;
+   }
 
    requestAnimationFrame(startGame);
 }
@@ -43,19 +59,24 @@ function startGame() {
 onMounted(() => {
    if (!canvas.value) return;
    context = canvas.value.getContext('2d');
-   startGame();
+   requestAnimationFrame(startGame);
 });
 </script>
 
 <template>
    <ul>
-      <li>A Pressed: {{ A }}</li>
+      <li>isConnected 1: {{ isConnected }}</li>
+      <li>isConnected 2: {{ isConnected2 }}</li>
    </ul>
-   <canvas width="500" height="500" ref="canvas"></canvas>
+   <canvas width="1365" height="800" ref="canvas"></canvas>
 </template>
 
 <style lang="scss">
 .bold {
    font-weight: 600;
+}
+
+body {
+   margin: 0;
 }
 </style>
