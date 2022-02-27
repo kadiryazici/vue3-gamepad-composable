@@ -44,8 +44,8 @@ export function useGamepad({
    const Y = ref(false);
    const LB = ref(false);
    const RB = ref(false);
-   const LR = ref(0);
    const LT = ref(0);
+   const RT = ref(0);
    const Back = ref(false);
    const Start = ref(false);
    const LSB = ref(false);
@@ -72,7 +72,7 @@ export function useGamepad({
       });
    }
 
-   const buttons = [A, B, X, Y, LB, RB, LR, LT, Back, Start, LSB, RSB, Up, Down, Left, Right, XboxKey];
+   const buttons = [A, B, X, Y, LB, RB, LT, RT, Back, Start, LSB, RSB, Up, Down, Left, Right, XboxKey];
    const axes = [LeftX, LeftY, RightX, RightY];
 
    function resetState() {
@@ -109,7 +109,7 @@ export function useGamepad({
       Y: computed(() => Y.value),
       LB: computed(() => LB.value),
       RB: computed(() => RB.value),
-      LR: computed(() => LR.value),
+      RT: computed(() => RT.value),
       LT: computed(() => LT.value),
       Back: computed(() => Back.value),
       Start: computed(() => Start.value),
