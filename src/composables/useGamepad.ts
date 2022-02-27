@@ -1,4 +1,4 @@
-import { computed, ref } from 'vue';
+import { shallowReadonly, shallowRef } from 'vue';
 
 export const enum XboxButtons {
    A,
@@ -38,30 +38,30 @@ const isTriggerButton = (index: number) => index === 6 || index === 7;
 export function useGamepad({
    index: gamepadIndex = 0, //
 }: IGamepadOptions = {}) {
-   const A = ref(false);
-   const B = ref(false);
-   const X = ref(false);
-   const Y = ref(false);
-   const LB = ref(false);
-   const RB = ref(false);
-   const LT = ref(0);
-   const RT = ref(0);
-   const Back = ref(false);
-   const Start = ref(false);
-   const LSB = ref(false);
-   const RSB = ref(false);
-   const Up = ref(false);
-   const Down = ref(false);
-   const Left = ref(false);
-   const Right = ref(false);
-   const XboxKey = ref(false);
+   const A = shallowRef(false);
+   const B = shallowRef(false);
+   const X = shallowRef(false);
+   const Y = shallowRef(false);
+   const LB = shallowRef(false);
+   const RB = shallowRef(false);
+   const LT = shallowRef(0);
+   const RT = shallowRef(0);
+   const Back = shallowRef(false);
+   const Start = shallowRef(false);
+   const LSB = shallowRef(false);
+   const RSB = shallowRef(false);
+   const Up = shallowRef(false);
+   const Down = shallowRef(false);
+   const Left = shallowRef(false);
+   const Right = shallowRef(false);
+   const XboxKey = shallowRef(false);
 
-   const LeftX = ref(0);
-   const LeftY = ref(0);
-   const RightX = ref(0);
-   const RightY = ref(0);
+   const LeftX = shallowRef(0);
+   const LeftY = shallowRef(0);
+   const RightX = shallowRef(0);
+   const RightY = shallowRef(0);
 
-   const isConnected = ref(false);
+   const isConnected = shallowRef(false);
    if (isBrowser()) {
       window.addEventListener('gamepadconnected', (e) => {
          if (e.gamepad.index === gamepadIndex) isConnected.value = true;
@@ -103,28 +103,28 @@ export function useGamepad({
    }
 
    return {
-      A: computed(() => A.value),
-      B: computed(() => B.value),
-      X: computed(() => X.value),
-      Y: computed(() => Y.value),
-      LB: computed(() => LB.value),
-      RB: computed(() => RB.value),
-      RT: computed(() => RT.value),
-      LT: computed(() => LT.value),
-      Back: computed(() => Back.value),
-      Start: computed(() => Start.value),
-      LSB: computed(() => LSB.value),
-      RSB: computed(() => RSB.value),
-      Up: computed(() => Up.value),
-      Down: computed(() => Down.value),
-      Left: computed(() => Left.value),
-      Right: computed(() => Right.value),
-      XboxKey: computed(() => XboxKey.value),
-      LeftX: computed(() => LeftX.value),
-      LeftY: computed(() => LeftY.value),
-      RightX: computed(() => RightX.value),
-      RightY: computed(() => RightY.value),
-      isConnected: computed(() => isConnected.value),
+      A: shallowReadonly(A),
+      B: shallowReadonly(B),
+      X: shallowReadonly(X),
+      Y: shallowReadonly(Y),
+      LB: shallowReadonly(LB),
+      RB: shallowReadonly(RB),
+      RT: shallowReadonly(RT),
+      LT: shallowReadonly(LT),
+      Back: shallowReadonly(Back),
+      Start: shallowReadonly(Start),
+      LSB: shallowReadonly(LSB),
+      RSB: shallowReadonly(RSB),
+      Up: shallowReadonly(Up),
+      Down: shallowReadonly(Down),
+      Left: shallowReadonly(Left),
+      Right: shallowReadonly(Right),
+      XboxKey: shallowReadonly(XboxKey),
+      LeftX: shallowReadonly(LeftX),
+      LeftY: shallowReadonly(LeftY),
+      RightX: shallowReadonly(RightX),
+      RightY: shallowReadonly(RightY),
+      isConnected: shallowReadonly(isConnected),
       tick,
    };
 }
